@@ -82,6 +82,13 @@ func init() {
 
 // Generates *_test.go files for the non _test.go files and ignored ones.
 func GenerateTests(templateVariables map[string][]TemplateVars, isDryRun bool) {
+	// This one is here to aviod `os.Create` and `f.Defer` being in the loop.
+	f, err := os.Create(os.DevNull)
+	if err != nil {
+		fmt.Println("Error /dev/null")
+		panic(err)
+	}
+
 	for ptf, tv := range templateVariables {
 		if li := strings.LastIndex(ptf, "_test.go"); li != -1 {
 			continue
@@ -100,16 +107,17 @@ func GenerateTests(templateVariables map[string][]TemplateVars, isDryRun bool) {
 			}
 			fmt.Println("== END TEMPLATE ==\n")
 		} else {
-			f, err := os.Create(filePath)
+			f, err = os.Create(filePath)
 			check(err)
 
 			err = temp.Execute(f, Temporary{PackageName: pckname, TV: &tv})
 			if err != nil {
 				panic(err)
 			}
-		}
 
+		}
 	}
 
-	fmt.Println()
+	// Clsoe the writing IO
+	defer f.Close()
 }
