@@ -19,11 +19,16 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-        err := manifests.Start()
+		isDryRun, err := cmd.Flags().GetBool("dry-run")
+		if err != nil {
+			panic("Something wrong with flags.")
+		}
 
-        if err != nil {
-            panic("Something went wrong")
-        }
+		err = manifests.Start(isDryRun)
+
+		if err != nil {
+			panic("Something went wrong")
+		}
 	},
 }
 
@@ -35,6 +40,7 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// startCmd.PersistentFlags().String("foo", "", "A help for foo")
+	startCmd.Flags().Bool("dry-run", false, "Only outputs the result to the terminal without any effect (no file creation).")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

@@ -9,7 +9,7 @@ func check(err error) {
 	}
 }
 
-func Start() error {
+func Start(isDryRun bool) error {
 	goFiles, err := ListAllGoFiles()
 	check(err)
 
@@ -18,8 +18,8 @@ func Start() error {
 
 	templateVariables := GenerateVars(pfuncs)
 
-    // Might panic
-	GenerateTests(templateVariables)
+	// Might panic
+	GenerateTests(templateVariables, isDryRun)
 
 	return nil
 }

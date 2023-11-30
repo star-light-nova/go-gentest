@@ -14,6 +14,7 @@ import (
 func Test{{ .FuncTestName }}(t *testing.T) {
     got := {{ .FuncName }}()
     want := ""
+
     if got != want {
         t.Fatal("Test didn't pass")
     }

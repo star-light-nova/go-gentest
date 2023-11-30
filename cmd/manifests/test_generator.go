@@ -81,7 +81,7 @@ func init() {
 }
 
 // Generates *_test.go files for the non _test.go files and ignored ones.
-func GenerateTests(templateVariables map[string][]TemplateVars) {
+func GenerateTests(templateVariables map[string][]TemplateVars, isDryRun bool) {
 	for ptf, tv := range templateVariables {
 		if li := strings.LastIndex(ptf, "_test.go"); li != -1 {
 			continue
@@ -90,13 +90,25 @@ func GenerateTests(templateVariables map[string][]TemplateVars) {
 		pckname := tv[0].PackageName
 		filePath := ptf[:len(ptf)-3] + "_test.go"
 
-		f, err := os.Create(filePath)
-		check(err)
+		if isDryRun {
+			fmt.Println("====================")
+			fmt.Printf("PACKAGE NAME: %s, PATH: %s\n\n", pckname, filePath)
+			fmt.Println("== BEGIN TEMPLATE ==")
+			err := temp.Execute(os.Stdout, Temporary{PackageName: pckname, TV: &tv})
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println("== END TEMPLATE ==\n")
+		} else {
+			f, err := os.Create(filePath)
+			check(err)
 
-		err = temp.Execute(f, Temporary{PackageName: pckname, TV: &tv})
-		if err != nil {
-			panic(err)
+			err = temp.Execute(f, Temporary{PackageName: pckname, TV: &tv})
+			if err != nil {
+				panic(err)
+			}
 		}
+
 	}
 
 	fmt.Println()
