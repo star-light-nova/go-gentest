@@ -21,10 +21,15 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		isDryRun, err := cmd.Flags().GetBool("dry-run")
 		if err != nil {
-			panic("Something wrong with flags.")
+			panic("Something wrong with flags. [DRY-RUN]")
 		}
 
-		err = manifests.Start(isDryRun)
+        testFolder, err := cmd.Flags().GetString("test-folder")
+        if err != nil {
+            panic("Something wrong with flags [TEST-FOLDER]")
+        }
+
+		err = manifests.Start(isDryRun, testFolder)
 
 		if err != nil {
 			panic("Something went wrong")
@@ -41,6 +46,7 @@ func init() {
 	// and all subcommands, e.g.:
 	// startCmd.PersistentFlags().String("foo", "", "A help for foo")
 	startCmd.Flags().Bool("dry-run", false, "Only outputs the result to the terminal without any effect (no file creation).")
+	startCmd.Flags().String("test-folder", "", "Generatest tests inside of the 'test' folder.")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

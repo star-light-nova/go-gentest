@@ -81,7 +81,7 @@ func init() {
 }
 
 // Generates *_test.go files for the non _test.go files and ignored ones.
-func GenerateTests(templateVariables map[string][]TemplateVars, isDryRun bool) {
+func GenerateTests(templateVariables map[string][]TemplateVars, isDryRun bool, testFolder string) {
 	// This one is here to aviod `os.Create` and `f.Defer` being in the loop.
 	f, err := os.Create(os.DevNull)
 	if err != nil {
@@ -95,7 +95,12 @@ func GenerateTests(templateVariables map[string][]TemplateVars, isDryRun bool) {
 		}
 
 		pckname := tv[0].PackageName
-		filePath := ptf[:len(ptf)-3] + "_test.go"
+        filePath := ptf[:len(ptf)-3] + "_test.go"
+
+        // Add test/ folder behind everything.
+        if len(testFolder) != 0 {
+            filePath = testFolder + "/" + filePath
+        }
 
 		if isDryRun {
 			fmt.Println("====================")
@@ -107,6 +112,8 @@ func GenerateTests(templateVariables map[string][]TemplateVars, isDryRun bool) {
 			}
 			fmt.Println("== END TEMPLATE ==\n")
 		} else {
+            err = os.MkdirAll(filePath[:strings.LastIndex(filePath, "/")], os.ModePerm)
+            check(err)
 			f, err = os.Create(filePath)
 			check(err)
 
