@@ -14,19 +14,34 @@ import (
 )
 
 const (
+	/*
+	   The package name is considered to be the directory where the `.go` file exist.
+
+	   EXAMPLE: path/to/file.go in this case the package name will be `to`
+	   and the template will output `package to` for this test file.
+
+	   If we can't go any further:
+
+	   EXAMPLE: main.go (folder that has one file), this const DEFAULT_PACKAGE
+	   is written as a package name
+	*/
 	DEFAULT_PACKAGE = "main"
 )
 
+// Holds all information for template.
 type TemplateVars struct {
 	PackageName  string
 	FuncName     string
 	FuncTestName string
 }
 
-// Parse the current path of the file
-// and returns the last folder as a package name.
-// If the length of the split path array is less than 2
-// the default package returned (main)
+/*
+Parse the current path of the file
+and returns the last folder as a package name.
+
+If the length of the split path array is less than 2
+the DEFAULT_PACKAGE const returned.
+*/
 func parsePackageNameFromPath(path string) string {
 	packagePathArray := strings.Split(path, "/")
 
@@ -37,7 +52,7 @@ func parsePackageNameFromPath(path string) string {
 	return DEFAULT_PACKAGE
 }
 
-// Generates variables for the templates.
+// Groups information about every function in every file.
 func GenerateVars(pfuncs map[PathFunc]*ast.FuncDecl) map[string][]TemplateVars {
 	generatedVars := map[string][]TemplateVars{}
 
@@ -54,20 +69,13 @@ func GenerateVars(pfuncs map[PathFunc]*ast.FuncDecl) map[string][]TemplateVars {
 			generatedVars[pf.PathToFile] = []TemplateVars{myFunc}
 		}
 
-		// fmt.Println("Params\n", _func.Type.Params)
-		// if _func.Type.Params != nil && _func.Type.Params.List != nil {
-		// 	fmt.Println("DOES HAVE PARAMS")
-
-		// 	fmt.Println("LIST", _func.Type.Params.List[0])
-		// }
-		// fmt.Println("Params", _func.Type.Params)
-		// fmt.Println("Type Params", _func.Type.TypeParams)
-		// fmt.Println("Returns", _func.Type.Results)
+		// TODO: Do something with return values/type and params values/types
 	}
 
 	return generatedVars
 }
 
+// Template is going to be created using these values.
 type Temporary struct {
 	PackageName string
 	TV          *[]TemplateVars
@@ -80,7 +88,7 @@ func init() {
 	temp = template.Must(templ.SimpleTemplate())
 }
 
-// Generates *_test.go files for the non _test.go files and ignored ones.
+// Generates `*_test.go` files for the non `_test.go` files and ignored ones.
 func GenerateTests(templateVariables map[string][]TemplateVars, flagsValues *FlagsValues) {
 	// This one is here to aviod `os.Create` and `f.Defer` being in the loop.
 	f, err := os.Create(os.DevNull)
@@ -89,18 +97,19 @@ func GenerateTests(templateVariables map[string][]TemplateVars, flagsValues *Fla
 		panic(err)
 	}
 
+	// TODO: Refactor
 	for ptf, tv := range templateVariables {
 		if li := strings.LastIndex(ptf, "_test.go"); li != -1 {
 			continue
 		}
 
 		pckname := tv[0].PackageName
-        filePath := ptf[:len(ptf)-3] + "_test.go"
+		filePath := ptf[:len(ptf)-3] + "_test.go"
 
-        // Add test/ folder behind everything.
-        if len(flagsValues.TestFolder) != 0 {
-            filePath = flagsValues.TestFolder + "/" + filePath
-        }
+		// Add test/ folder as a parent folder.
+		if flagsValues.IsTestFolder {
+			filePath = flagsValues.TestFolder + "/" + filePath
+		}
 
 		if flagsValues.IsDryRun {
 			fmt.Println("====================")
@@ -112,8 +121,11 @@ func GenerateTests(templateVariables map[string][]TemplateVars, flagsValues *Fla
 			}
 			fmt.Println("== END TEMPLATE ==\n")
 		} else {
-            err = os.MkdirAll(filePath[:strings.LastIndex(filePath, "/")], os.ModePerm)
-            check(err)
+            if flagsValues.IsTestFolder {
+                err = os.MkdirAll(filePath[:strings.LastIndex(filePath, "/")], os.ModePerm)
+                check(err)
+            }
+
 			f, err = os.Create(filePath)
 			check(err)
 

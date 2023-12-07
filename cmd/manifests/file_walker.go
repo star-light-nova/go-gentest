@@ -12,6 +12,7 @@ import (
 	"strings"
 )
 
+// Walks in the current directory to find `.go` files. [fileName]=path
 func ListAllGoFiles() (map[string]string, error) {
 	log.SetPrefix("LOG:")
 	log.Println("Starting Function")

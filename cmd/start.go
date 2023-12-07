@@ -30,10 +30,13 @@ to quickly create a Cobra application.`,
 		if testFolder, err := cmd.Flags().GetString("test-folder"); err != nil {
 			panic("Something wrong with flags [TEST-FOLDER]")
 		} else {
-			flagsValues.TestFolder = testFolder
+			if len(testFolder) != 0 {
+				flagsValues.TestFolder = testFolder
+				flagsValues.IsTestFolder = true
+			}
 		}
 
-        err := manifests.Start(flagsValues)
+		err := manifests.Start(flagsValues)
 
 		if err != nil {
 			panic("Something went wrong")

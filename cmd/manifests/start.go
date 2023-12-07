@@ -7,7 +7,9 @@ package manifests
 // that changes the functionality of the command.
 type FlagsValues struct {
 	IsDryRun bool
-	TestFolder string
+
+	IsTestFolder bool
+	TestFolder   string
 }
 
 func check(err error) {
@@ -17,9 +19,20 @@ func check(err error) {
 }
 
 func NewFlagsValues() *FlagsValues {
-    return &FlagsValues{}
+	return &FlagsValues{}
 }
 
+/*
+What is going to be done:
+
+1. Gather all `.go` files in the current directory with `[fileName]=path` format
+
+2. Goes through all collected path of `.go` files and extracts functions
+
+3. Prepares variables for the template
+
+4. Generates `_test.go` files depending on the flag, migh just output to the terminal.
+*/
 func Start(flagsValues *FlagsValues) error {
 	goFiles, err := ListAllGoFiles()
 	check(err)

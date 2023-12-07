@@ -8,7 +8,6 @@ const SIMPLE_TEMPLATE = `package {{ .PackageName }}
 
 import (
     "testing"
-    "fmt"
 )
 {{ range .TV }}
 func Test{{ .FuncTestName }}(t *testing.T) {
