@@ -75,13 +75,13 @@ type Temporary struct {
 
 var temp *template.Template
 
-// Move it to another file?
+// Move it to another file? (func#init, functGenerateTests)
 func init() {
 	temp = template.Must(templ.SimpleTemplate())
 }
 
 // Generates *_test.go files for the non _test.go files and ignored ones.
-func GenerateTests(templateVariables map[string][]TemplateVars, isDryRun bool, testFolder string) {
+func GenerateTests(templateVariables map[string][]TemplateVars, flagsValues *FlagsValues) {
 	// This one is here to aviod `os.Create` and `f.Defer` being in the loop.
 	f, err := os.Create(os.DevNull)
 	if err != nil {
@@ -98,11 +98,11 @@ func GenerateTests(templateVariables map[string][]TemplateVars, isDryRun bool, t
         filePath := ptf[:len(ptf)-3] + "_test.go"
 
         // Add test/ folder behind everything.
-        if len(testFolder) != 0 {
-            filePath = testFolder + "/" + filePath
+        if len(flagsValues.TestFolder) != 0 {
+            filePath = flagsValues.TestFolder + "/" + filePath
         }
 
-		if isDryRun {
+		if flagsValues.IsDryRun {
 			fmt.Println("====================")
 			fmt.Printf("PACKAGE NAME: %s, PATH: %s\n\n", pckname, filePath)
 			fmt.Println("== BEGIN TEMPLATE ==")
