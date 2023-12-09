@@ -10,6 +10,9 @@ type FlagsValues struct {
 
 	IsTestFolder bool
 	TestFolder   string
+
+	IsTestOnly     bool
+	TestOnlyFolder string
 }
 
 func check(err error) {
@@ -27,15 +30,22 @@ What is going to be done:
 
 1. Gather all `.go` files in the current directory with `[fileName]=path` format
 
-2. Goes through all collected path of `.go` files and extracts functions
+2. Goes through all collected path of `.go` files and extracts functions, if `--test-only` flag used
+will only goes through the specified `.go` file.
 
 3. Prepares variables for the template
 
 4. Generates `_test.go` files depending on the flag, migh just output to the terminal.
 */
 func Start(flagsValues *FlagsValues) error {
-	goFiles, err := ListAllGoFiles()
-	check(err)
+	var goFiles = map[string]string{}
+	var err error
+
+	if flagsValues.IsTestOnly {
+		goFiles, err = FindAndCollectOneFile(flagsValues.TestOnlyFolder)
+	} else {
+		goFiles, err = ListAllGoFiles()
+	}
 
 	pfuncs, err := GetFuncsByFiles(goFiles)
 	check(err)

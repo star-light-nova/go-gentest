@@ -4,20 +4,19 @@ Copyright © 2023 Alikhan Toleubay <alikhan.toleubay@gmail.com>
 package manifests
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
-	"log"
-	"slices"
+	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
+var SKIP_DIRS = []string{".git"}
+
 // Walks in the current directory to find `.go` files. [fileName]=path
 func ListAllGoFiles() (map[string]string, error) {
-	log.SetPrefix("LOG:")
-	log.Println("Starting Function")
-
-	skipDirs := []string{".git"}
 	dctOfGoFiles := map[string]string{}
 
 	err := filepath.Walk(".", func(path string, info fs.FileInfo, err error) error {
@@ -26,19 +25,19 @@ func ListAllGoFiles() (map[string]string, error) {
 			return err
 		}
 
-		if info.IsDir() && slices.Contains(skipDirs, info.Name()) {
-            // Skipping directories that configure in the array skipDirs
-			// fmt.Printf("skipping a dir configured in the list: %v\n", skipDirs)
+		if info.IsDir() && slices.Contains(SKIP_DIRS, info.Name()) {
+			// Skipping directories that configure in the array SKIP_DIRS
+			// fmt.Printf("skipping a dir configured in the list: %v\n", SKIP_DIRS)
 
 			return filepath.SkipDir
 		} else if strings.LastIndex(info.Name(), ".go") == -1 {
-            // Skipping non-.go files
+			// Skipping non-.go files
 			// fmt.Printf("skipping non-.go files, %q\n", info.Name())
 
 			return nil
 		}
 
-        dctOfGoFiles[info.Name()] = path
+		dctOfGoFiles[info.Name()] = path
 
 		return nil
 	})
@@ -48,4 +47,18 @@ func ListAllGoFiles() (map[string]string, error) {
 	}
 
 	return dctOfGoFiles, nil
+}
+
+// Finds the file specified by `--test-only` flag
+func FindAndCollectOneFile(path string) (map[string]string, error) {
+	if file, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		fmt.Println("ERROR: " + err.Error())
+		panic("Didn't find the file in this path: " + path)
+	} else {
+		dctOfGoFile := map[string]string{}
+
+		dctOfGoFile[file.Name()] = path
+
+		return dctOfGoFile, err
+	}
 }
