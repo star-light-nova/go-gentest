@@ -1,6 +1,3 @@
-/*
-Copyright © 2023 Alikhan Toleubay <alikhan.toleubay@gmail.com>
-*/
 package manifests
 
 import (

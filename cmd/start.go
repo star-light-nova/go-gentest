@@ -1,6 +1,3 @@
-/*
-Copyright © 2023 Alikhan Toleubay <alikhan.toleubay@gmail.com>
-*/
 package cmd
 
 import (
@@ -36,11 +33,13 @@ to quickly create a Cobra application.`,
 			}
 		}
 
-		if testOnlyFolder, err := cmd.Flags().GetString("test-only"); err != nil {
+		if testOnlyFile, err := cmd.Flags().GetString("test-only"); err != nil {
 			panic("Seomthing wrong with flag [TEST-ONLY]")
 		} else {
-			flagsValues.IsTestOnly = true
-			flagsValues.TestOnlyFolder = testOnlyFolder
+			if len(testOnlyFile) != 0 {
+				flagsValues.IsTestOnly = true
+				flagsValues.TestOnlyFile = testOnlyFile
+			}
 		}
 
 		err := manifests.Start(flagsValues)
@@ -54,16 +53,7 @@ to quickly create a Cobra application.`,
 func init() {
 	rootCmd.AddCommand(startCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// startCmd.PersistentFlags().String("foo", "", "A help for foo")
 	startCmd.Flags().Bool("dry-run", false, "Only outputs the result to the terminal without any effect (no file creation).")
 	startCmd.Flags().String("test-folder", "", "Generates tests inside of the 'test' folder.")
 	startCmd.Flags().String("test-only", "", "Generates only one specified `.go` file.")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// startCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

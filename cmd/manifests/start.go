@@ -1,6 +1,3 @@
-/*
-Copyright © 2023 Alikhan Toleubay <alikhan.toleubay@gmail.com>
-*/
 package manifests
 
 // This struct is a collection of the variables
@@ -12,7 +9,7 @@ type FlagsValues struct {
 	TestFolder   string
 
 	IsTestOnly     bool
-	TestOnlyFolder string
+	TestOnlyFile string
 }
 
 func check(err error) {
@@ -42,7 +39,7 @@ func Start(flagsValues *FlagsValues) error {
 	var err error
 
 	if flagsValues.IsTestOnly {
-		goFiles, err = FindAndCollectOneFile(flagsValues.TestOnlyFolder)
+		goFiles, err = FindAndCollectOneFile(flagsValues.TestOnlyFile)
 	} else {
 		goFiles, err = ListAllGoFiles()
 	}
