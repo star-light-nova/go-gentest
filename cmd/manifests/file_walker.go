@@ -52,10 +52,6 @@ func FindAndCollectOneFile(path string) (map[string]string, error) {
 		fmt.Println("ERROR: " + err.Error())
 		panic("Didn't find the file in this path: " + path)
 	} else {
-		dctOfGoFile := map[string]string{}
-
-		dctOfGoFile[file.Name()] = path
-
-		return dctOfGoFile, err
+		return map[string]string{file.Name(): path}, err
 	}
 }

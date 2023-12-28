@@ -46,12 +46,12 @@ func flagsChecker(cmd *cobra.Command, flagsValues *manifests.FlagsValues) {
 		}
 	}
 
-	if testOnlyFile, err := cmd.Flags().GetString("test-only"); err != nil {
+	if testOnlyFilePath, err := cmd.Flags().GetString("test-only"); err != nil {
 		panic("Seomthing wrong with flag [TEST-ONLY]")
 	} else {
-		if len(testOnlyFile) != 0 {
+		if len(testOnlyFilePath) != 0 {
 			flagsValues.IsTestOnly = true
-			flagsValues.TestOnlyFile = testOnlyFile
+			flagsValues.TestOnlyFilePath = testOnlyFilePath
 		}
 	}
 

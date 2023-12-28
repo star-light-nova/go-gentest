@@ -8,8 +8,8 @@ type FlagsValues struct {
 	IsTestFolder bool
 	TestFolder   string
 
-	IsTestOnly   bool
-	TestOnlyFile string
+	IsTestOnly       bool
+	TestOnlyFilePath string
 }
 
 // TODO: Maybe remove?
@@ -40,7 +40,7 @@ func Start(flagsValues *FlagsValues) error {
 	var err error
 
 	if flagsValues.IsTestOnly {
-		goFiles, err = FindAndCollectOneFile(flagsValues.TestOnlyFile)
+		goFiles, err = FindAndCollectOneFile(flagsValues.TestOnlyFilePath)
 	} else {
 		goFiles, err = ListAllGoFiles()
 	}
@@ -51,6 +51,7 @@ func Start(flagsValues *FlagsValues) error {
 	templateVariables := GenerateVars(pfuncs)
 
 	// Might panic
+	// todo return an error
 	GenerateTests(templateVariables, flagsValues)
 
 	return nil
