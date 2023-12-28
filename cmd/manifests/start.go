@@ -8,10 +8,11 @@ type FlagsValues struct {
 	IsTestFolder bool
 	TestFolder   string
 
-	IsTestOnly     bool
+	IsTestOnly   bool
 	TestOnlyFile string
 }
 
+// TODO: Maybe remove?
 func check(err error) {
 	if err != nil {
 		panic(err)
