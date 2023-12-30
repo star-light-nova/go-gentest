@@ -10,7 +10,7 @@ import (
 )
 
 // Template is going to be created using these values.
-type Temporary struct {
+type Template struct {
 	PackageName string
 	TV          *[]TemplateVars
 }
@@ -30,7 +30,6 @@ func GenerateTests(templateVariables map[string][]TemplateVars, flagsValues *Fla
 		panic(err)
 	}
 
-	// TODO: Refactor
 	for ptf, tv := range templateVariables {
 		if li := strings.LastIndex(ptf, "_test.go"); li != -1 {
 			continue
@@ -39,37 +38,50 @@ func GenerateTests(templateVariables map[string][]TemplateVars, flagsValues *Fla
 		pckname := tv[0].PackageName
 		filePath := ptf[:len(ptf)-3] + "_test.go"
 
-		// Add test/ folder as a parent folder.
+		// Add `test/` folder as a parent folder.
 		if flagsValues.IsTestFolder {
 			filePath = flagsValues.TestFolder + "/" + filePath
 		}
 
 		if flagsValues.IsDryRun {
-			fmt.Println("====================")
-			fmt.Printf("PACKAGE NAME: %s, PATH: %s\n\n", pckname, filePath)
-			fmt.Println("== BEGIN TEMPLATE ==")
-			err := temp.Execute(os.Stdout, Temporary{PackageName: pckname, TV: &tv})
-			if err != nil {
-				panic(err)
-			}
-			fmt.Println("== END TEMPLATE ==\n")
+			dryRun(pckname, filePath, &tv)
 		} else {
 			if flagsValues.IsTestFolder {
 				err = os.MkdirAll(filePath[:strings.LastIndex(filePath, "/")], os.ModePerm)
 				check(err)
 			}
 
-			f, err = os.Create(filePath)
-			check(err)
-
-			err = temp.Execute(f, Temporary{PackageName: pckname, TV: &tv})
-			if err != nil {
-				panic(err)
-			}
-
+			realRun(pckname, filePath, &tv, f)
 		}
 	}
 
-	// Clsoe the writing IO
+	// Clsoe the file IO
 	defer f.Close()
+}
+
+func dryRun(pckname, filePath string, tv *[]TemplateVars) {
+	fmt.Println("====================")
+	fmt.Printf("PACKAGE NAME: %s, PATH: %s\n\n", pckname, filePath)
+	fmt.Println("== BEGIN TEMPLATE ==")
+
+	executeTemplate(os.Stdout, pckname, tv)
+
+	fmt.Println("== END TEMPLATE ==\n")
+}
+
+func realRun(pckname, filePath string, tv *[]TemplateVars, f *os.File) {
+	var err error
+
+	f, err = os.Create(filePath)
+	check(err)
+
+	executeTemplate(f, pckname, tv)
+}
+
+// TODO: Description
+func executeTemplate(writer *os.File, pckname string, tv *[]TemplateVars) {
+	err := temp.Execute(writer, Template{PackageName: pckname, TV: tv})
+	if err != nil {
+		panic(err)
+	}
 }
