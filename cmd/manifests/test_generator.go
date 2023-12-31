@@ -26,8 +26,7 @@ func GenerateTests(templateVariables map[string][]TemplateVars, flagsValues *Fla
 	// This one is here to aviod `os.Create` and `f.Defer` being in the loop.
 	f, err := os.Create(os.DevNull)
 	if err != nil {
-		fmt.Println("Error /dev/null")
-		panic(err)
+		panic("[DevNull] Couldn't access to the /dev/null" + err.Error())
 	}
 
 	for ptf, tv := range templateVariables {
@@ -48,7 +47,9 @@ func GenerateTests(templateVariables map[string][]TemplateVars, flagsValues *Fla
 		} else {
 			if flagsValues.IsTestFolder {
 				err = os.MkdirAll(filePath[:strings.LastIndex(filePath, "/")], os.ModePerm)
-				check(err)
+				if err != nil {
+					panic("[--test-folder#MkdirrAll] Couldn't create a folder/files: " + err.Error())
+				}
 			}
 
 			realRun(pckname, filePath, &tv, f)
@@ -73,7 +74,9 @@ func realRun(pckname, filePath string, tv *[]TemplateVars, f *os.File) {
 	var err error
 
 	f, err = os.Create(filePath)
-	check(err)
+	if err != nil {
+		panic("[RealRun] File creation error: " + err.Error())
+	}
 
 	executeTemplate(f, pckname, tv)
 }
@@ -82,6 +85,6 @@ func realRun(pckname, filePath string, tv *[]TemplateVars, f *os.File) {
 func executeTemplate(writer *os.File, pckname string, tv *[]TemplateVars) {
 	err := temp.Execute(writer, Template{PackageName: pckname, TV: tv})
 	if err != nil {
-		panic(err)
+		panic("[Template Execution] Writer: " + writer.Name() + " error: " + err.Error())
 	}
 }

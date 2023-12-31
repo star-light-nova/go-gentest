@@ -16,7 +16,7 @@ var SKIP_DIRS = []string{".git"}
 func walkCurrentDirectory(goFiles map[string]string) error {
 	walker := func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
-			fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
+			fmt.Printf("[Walking] Prevent panic by handling failure accessing a path %q: %v\n", path, err)
 			return err
 		}
 
@@ -38,23 +38,22 @@ func walkCurrentDirectory(goFiles map[string]string) error {
 	return filepath.Walk(".", walker)
 }
 
-func ListAllGoFiles() (map[string]string, error) {
+func ListAllGoFiles() map[string]string {
 	dctOfGoFiles := map[string]string{}
 
 	err := walkCurrentDirectory(dctOfGoFiles)
 	if err != nil {
-		panic(err)
+		panic("[Listing] Walked through current directory, but got an error: " + err.Error())
 	}
 
-	return dctOfGoFiles, nil
+	return dctOfGoFiles
 }
 
 // Finds the file specified by `--test-only` flag
-func FindAndCollectOneFile(path string) (map[string]string, error) {
+func FindAndCollectOneFile(path string) map[string]string {
 	if file, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-		fmt.Println("ERROR: " + err.Error())
-		panic("Didn't find the file in this path: " + path)
+		panic("[--test-only] Didn't find the file in this path: " + path + " \nError: " + err.Error())
 	} else {
-		return map[string]string{file.Name(): path}, err
+		return map[string]string{file.Name(): path}
 	}
 }

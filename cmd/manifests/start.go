@@ -12,13 +12,6 @@ type FlagsValues struct {
 	TestOnlyFilePath string
 }
 
-// TODO: Maybe remove?
-func check(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 func NewFlagsValues() *FlagsValues {
 	return &FlagsValues{}
 }
@@ -35,24 +28,17 @@ will only goes through the specified `.go` file.
 
 4. Generates `_test.go` files depending on the flag, migh just output to the terminal.
 */
-func Start(flagsValues *FlagsValues) error {
+func Start(flagsValues *FlagsValues) {
 	var goFiles = map[string]string{}
-	var err error
 
 	if flagsValues.IsTestOnly {
-		goFiles, err = FindAndCollectOneFile(flagsValues.TestOnlyFilePath)
+		goFiles = FindAndCollectOneFile(flagsValues.TestOnlyFilePath)
 	} else {
-		goFiles, err = ListAllGoFiles()
+		goFiles = ListAllGoFiles()
 	}
 
-	pfuncs, err := GetFuncsByFiles(goFiles)
-	check(err)
-
+	pfuncs := GetFuncsByFiles(goFiles)
 	templateVariables := GenerateVars(pfuncs)
 
-	// Might panic
-	// todo return an error
 	GenerateTests(templateVariables, flagsValues)
-
-	return nil
 }

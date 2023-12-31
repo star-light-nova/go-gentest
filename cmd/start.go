@@ -13,7 +13,6 @@ func init() {
 	startCmd.Flags().String("test-only", "", "Generates only one specified '.go' file.")
 }
 
-// startCmd represents the `start` command
 var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: START_HELP_SHORT,
@@ -23,22 +22,19 @@ var startCmd = &cobra.Command{
 
 		flagsChecker(cmd, flagsValues)
 
-		err := manifests.Start(flagsValues)
-		if err != nil {
-			panic("Something went wrong")
-		}
+		manifests.Start(flagsValues)
 	},
 }
 
 func flagsChecker(cmd *cobra.Command, flagsValues *manifests.FlagsValues) {
 	if isDryRun, err := cmd.Flags().GetBool("dry-run"); err != nil {
-		panic("Something wrong with flags. [DRY-RUN]")
+		panic("[--dry-run] Can't assign value: " + err.Error())
 	} else {
 		flagsValues.IsDryRun = isDryRun
 	}
 
 	if testFolder, err := cmd.Flags().GetString("test-folder"); err != nil {
-		panic("Something wrong with flags [TEST-FOLDER]")
+		panic("[--test-folder] Can't assign value: " + err.Error())
 	} else {
 		if len(testFolder) != 0 {
 			flagsValues.TestFolder = testFolder
@@ -47,7 +43,7 @@ func flagsChecker(cmd *cobra.Command, flagsValues *manifests.FlagsValues) {
 	}
 
 	if testOnlyFilePath, err := cmd.Flags().GetString("test-only"); err != nil {
-		panic("Seomthing wrong with flag [TEST-ONLY]")
+		panic("[--test-only] Can't assign value: " + err.Error())
 	} else {
 		if len(testOnlyFilePath) != 0 {
 			flagsValues.IsTestOnly = true

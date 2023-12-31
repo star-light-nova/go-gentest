@@ -1,11 +1,9 @@
 package manifests
 
 import (
-	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"os"
 )
 
 type PathFunc struct {
@@ -20,21 +18,20 @@ func init() {
 }
 
 // Traverse through the files, and find the functions
-func GetFuncsByFiles(dct map[string]string) (map[PathFunc]*ast.FuncDecl, error) {
+func GetFuncsByFiles(dct map[string]string) map[PathFunc]*ast.FuncDecl {
 	// TODO: O(N^2), try to make it faster if needed.
 	// Add some ignore file to ignore most of the non-.go files
 	for _, fPath := range dct {
 		set := token.NewFileSet()
 		parsedFiles, err := parser.ParseFile(set, fPath, nil, parser.Mode(0))
 		if err != nil {
-			fmt.Println("Failed to parse package:", err)
-			os.Exit(1)
+			panic("[Parsing Files] Failed to parse a file: " + err.Error())
 		}
 
 		populateFuncs(parsedFiles.Decls, fPath)
 	}
 
-	return funcs, nil
+	return funcs
 }
 
 func populateFuncs(parsedFilesDecl []ast.Decl, fPath string) {
