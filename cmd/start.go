@@ -10,7 +10,7 @@ func init() {
 
 	startCmd.Flags().Bool("dry-run", false, "Only outputs the result to the terminal without any effect (no file creation).")
 	startCmd.Flags().String("test-folder", "", "Generates tests inside of the 'test' folder.")
-	startCmd.Flags().String("test-only", "", "Generates only one specified `.go` file.")
+	startCmd.Flags().String("test-only", "", "Generates only one specified '.go' file.")
 }
 
 // startCmd represents the `start` command

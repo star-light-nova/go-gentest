@@ -1,18 +1,33 @@
 package cmd
 
 const (
-	ROOT_HELP_SHORT = "A brief description of your application"
-	ROOT_HELP_LONG  = `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	ROOT_HELP_SHORT = `Generates '_test.go' files for '.go' files.`
+	ROOT_HELP_LONG  = `Welcome to the '_test.go' generator.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`
-	START_HELP_SHORT = "A brief description of your command"
-	START_HELP_LONG  = `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+The name literary means 'Go Generate Test'.
+Right now, the only available command is 'start'
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`
+Please enter this command to know more about:
+    > gentest start --help
+`
+	START_HELP_SHORT = `Command that allows to generate '_test.go' files in the current directory.`
+	START_HELP_LONG  = `Actual implementation of the generator.
+
+    Will create '<file_name>_test.go' file right after each '<file_name>.go' file.
+    > gentest start
+
+If you want to know more about the functionality, please read "README.md#flags".
+
+Command example:
+    Fully prints out program output to the current terminal session,
+    so that it won't affect to your current directory.
+    Consider this as a safe-run with no effect (*can be run in combination with other flags), but with informative output.
+    > gentest start --dry-run
+
+    If you want to generate everything in separate folder
+    > gentest start --test-folder=test_folder
+
+    If you have only one '.go' file to generate
+    > gentest start --test-only=path/to/foo.go
+`
 )
